@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "perspective-manager",
+	"version": "${version}",
+	"name": "Perspective Manager",
+	"description": "This is a perspective manager mod",
+	"authors": [
+		"Laisvall"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/Perspective-Manager-1.21.X"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/perspective-manager/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.laisvall.perspectivemanager.PerspectiveManager"
+		],
+        "client": [
+            "net.laisvall.perspectivemanager.client.PerspectiveManagerClient"
+        ]
+	},
+	"mixins": [
+	]
+}
