@@ -1,0 +1,70 @@
+package net.laisvall.perspectivemanager.client.input;
+
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.laisvall.perspectivemanager.client.data.PerspectiveStorage;
+import net.laisvall.perspectivemanager.client.logic.PerspectiveSwitcher;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+
+import org.lwjgl.glfw.GLFW;
+
+public class KeybindHandler {
+
+    public static KeyBinding SAVE_PERSPECTIVE;
+    public static KeyBinding CAROUSEL;
+    public static KeyBinding TOGGLE_LAST;
+    public static KeyBinding OPEN_RADIAL;
+
+    public static void register() {
+
+        // Register keybinds with Fabric
+        SAVE_PERSPECTIVE = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.perspectivemanager.save_perspective",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_K,
+                "key.categories.perspectivemanager"
+        ));
+
+        CAROUSEL = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.perspectivemanager.carousel",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_V,
+                "key.categories.perspectivemanager"
+        ));
+
+        TOGGLE_LAST = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.perspectivemanager.toggle_last",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_B,
+                "key.categories.perspectivemanager"
+        ));
+
+        OPEN_RADIAL = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.perspectivemanager.open_radial",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_R,
+                "key.categories.perspectivemanager"
+        ));
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player == null) return;
+
+            if (SAVE_PERSPECTIVE.wasPressed()) {
+                PerspectiveStorage.saveCurrentView(client.player);
+            }
+
+            if (CAROUSEL.isPressed()) {
+            } else {
+            }
+
+            if (TOGGLE_LAST.wasPressed()) {
+                PerspectiveSwitcher.switchPerspective(client, PerspectiveSwitcher.getActivePerspective());
+            }
+
+            if (OPEN_RADIAL.wasPressed()) {
+                // TODO
+            }
+        });
+    }
+}
