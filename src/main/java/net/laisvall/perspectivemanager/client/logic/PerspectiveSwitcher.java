@@ -2,27 +2,46 @@ package net.laisvall.perspectivemanager.client.logic;
 
 import net.laisvall.perspectivemanager.client.data.Perspective;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.Vec3d;
 
 public class PerspectiveSwitcher {
-    private static Perspective activePerspective = null;
+    private static final PerspectiveSwitcher INSTANCE = new PerspectiveSwitcher();
 
-    public static void switchPerspective(MinecraftClient client, Perspective perspective) {
+    private PerspectiveSwitcher() { }
 
-        Vec3d pos = perspective.getPosition();
-        client.player.setPos(pos.x, pos.y, pos.z);
+    public static PerspectiveSwitcher getInstance() {
+        return INSTANCE;
+    }
 
+    private boolean inPerspective = false;
+    private Perspective originalPerspective;
+
+    public void switchPerspective(MinecraftClient client, Perspective perspective) {
+        if (!inPerspective) {
+            originalPerspective = new Perspective(
+                    client.player.getX(),
+                    client.player.getY(),
+                    client.player.getZ(),
+                    client.player.getYaw(),
+                    client.player.getPitch(),
+                    client.options.getFov().getValue()
+            );
+            setPerspective(client, perspective);
+            client.options.hudHidden = true;
+            inPerspective = true;
+        } else {
+            setPerspective(client, originalPerspective);
+            client.options.hudHidden = false;
+            inPerspective = false;
+            // TODO: showIndicator();
+        }
+    }
+
+    private void setPerspective(MinecraftClient client, Perspective perspective) {
+        client.player.setPos(perspective.getX(), perspective.getY(), perspective.getZ());
         client.player.setYaw(perspective.getYaw());
         client.player.setPitch(perspective.getPitch());
         client.options.getFov().setValue(perspective.getFov());
 
-    }
-
-    public static Perspective getActivePerspective() {
-        return activePerspective;
-    }
-
-    public static void setActivatedPerspective(Perspective perspective) {
-        activePerspective = perspective;
+        client.player.setVelocityClient(0, 0, 0);
     }
 }

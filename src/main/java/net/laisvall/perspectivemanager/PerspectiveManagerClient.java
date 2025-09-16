@@ -1,32 +1,19 @@
-package net.laisvall.perspectivemanager.client;
+package net.laisvall.perspectivemanager;
 
 import net.laisvall.perspectivemanager.client.config.ModConfig;
-import net.laisvall.perspectivemanager.client.data.PerspectiveStorage;
 import net.laisvall.perspectivemanager.client.input.KeybindHandler;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.laisvall.perspectivemanager.client.ui.MenuButton;
+import net.laisvall.perspectivemanager.client.ui.PerspectivePositionRenderer;
 
 public class PerspectiveManagerClient implements ClientModInitializer {
-
-    private static PerspectiveStorage storage;
-    private static ModConfig config;
-
     @Override
     public void onInitializeClient() {
-        storage = new PerspectiveStorage();
-        config = ModConfig.load();
+        ModConfig config = ModConfig.load();
 
         KeybindHandler.register();
         MenuButton.register();
-
-    }
-
-    public static PerspectiveStorage getStorage() {
-        return storage;
-    }
-
-    public static ModConfig getConfig() {
-        return config;
+        PerspectivePositionRenderer.init();
     }
 }
