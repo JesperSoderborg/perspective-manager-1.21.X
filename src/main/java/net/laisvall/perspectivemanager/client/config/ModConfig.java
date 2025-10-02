@@ -16,7 +16,7 @@ public class ModConfig {
             .create();
     private static final File CONFIG_FILE = new File(
             MinecraftClient.getInstance().runDirectory,
-            "config/perspective_manager_config.json"
+            "config/perspective_manager/perspective_manager_config.json"
     );
 
     // --- Singleton instance
