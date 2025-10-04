@@ -2,6 +2,8 @@ package net.laisvall.perspectivemanager.client.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.laisvall.perspectivemanager.client.data.Perspective;
+import net.laisvall.perspectivemanager.client.logic.PerspectiveStorage;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
@@ -10,6 +12,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
+
+import java.util.List;
 import java.util.Objects;
 
 import static net.minecraft.client.render.VertexFormats.POSITION_COLOR;
@@ -30,23 +34,39 @@ public class PerspectivePositionRenderer {
         Vec3d camPos = camera.getPos();
         matrices.translate(-camPos.x, -camPos.y, -camPos.z);
 
-        drawText("From below (Helicopter)", 5, 100, 0, 0.023f, 0xff00ff, false, matrices, vertexConsumers, camera);
-        drawText("Over", 0, 100, 0, 0.023f, 0xffbb00, false, matrices, vertexConsumers, camera);
-        drawText("From the left", 0, 100, 5, 0.023f, 0x00ff55, false, matrices, vertexConsumers, camera);
-        drawText("Fortress", 5, 100, 5, 0.023f, 0x008cff, false, matrices, vertexConsumers, camera);
+        List<Perspective> perspectives = PerspectiveStorage.getInstance().getPerspectives();
+        perspectives.forEach(perspective ->
+            drawText(
+                perspective.getName(),
+                perspective.getX(),
+                perspective.getY(),
+                perspective.getZ(),
+                0.023f,
+                perspective.getColor(),
+                false,
+                matrices,
+                vertexConsumers,
+                camera
+            )
+        );
+
+        // drawText("From below (Helicopter)", 5, 100, 0, 0.023f, 0xff00ff, false, matrices, vertexConsumers, camera);
+        // drawText("Over", 0, 100, 0, 0.023f, 0xffbb00, false, matrices, vertexConsumers, camera);
+        // drawText("From the left", 0, 100, 5, 0.023f, 0x00ff55, false, matrices, vertexConsumers, camera);
+        // drawText("Fortress", 5, 100, 5, 0.023f, 0x008cff, false, matrices, vertexConsumers, camera);
 
         RenderSystem.disableBlend();
         matrices.pop();
     }
 
-    public static void drawText(String text, int x, int y, int z, float scale, int color, boolean shadow, MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera) {
+    public static void drawText(String text, double x, double y, double z, float scale, int color, boolean shadow, MatrixStack matrices, VertexConsumerProvider vertexConsumers, Camera camera) {
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 
         matrices.push();
 
         // Translate to world position
-        Vec3d centerPos = Vec3d.ofCenter(new BlockPos(x, y, z));
-        matrices.translate(centerPos.x, centerPos.y, centerPos.z);
+        //Vec3d.ofCenter(new BlockPos((int)x, (int)y, (int)z));
+        matrices.translate(x, y, z);
 
         // Rotate to face camera
         matrices.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(camera.getYaw()));

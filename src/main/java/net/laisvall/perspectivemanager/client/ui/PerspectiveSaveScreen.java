@@ -99,14 +99,14 @@ public class PerspectiveSaveScreen extends Screen {
         int bottomRow = thirdButtonRow + buttonHeight + wideGap;
 
         int randomHue = ColorUtil.getRandomHue();
-        Color randomVibrantColor = ColorUtil.getColorFromHue(randomHue);
+        waypointColor = ColorUtil.getColorFromHue(randomHue);
 
         // --- Name field ---
         nameField = new TextFieldWidget(this.textRenderer,
                 centerX - wideButtonWidth/2 + narrowGap, topRow,
                 wideButtonWidth - 2*iconButtonSide - 3*narrowGap, buttonHeight, Text.of("Name"));
         nameField.setPlaceholder(Text.of("Unnamed Perspective"));
-        nameField.setEditableColor(ColorUtil.getHexFromColor(randomVibrantColor));
+        nameField.setEditableColor(ColorUtil.getHexFromColor(waypointColor));
         this.addSelectableChild(nameField);
 
         // --- Location Fields (X, Y, Z) ---
@@ -147,8 +147,8 @@ public class PerspectiveSaveScreen extends Screen {
         hexColorField = new TextFieldWidget(textRenderer,
                 centerX + wideGap/2 + wideButtonWidth - hexColorFieldWidth, firstButtonRow,
                 hexColorFieldWidth, buttonHeight, Text.of("HEX"));
-        hexColorField.setPlaceholder(Text.of(ColorUtil.getHexStringFromColor(randomVibrantColor)));
-        hexColorField.setEditableColor(ColorUtil.getHexFromColor(randomVibrantColor));
+        hexColorField.setPlaceholder(Text.of(ColorUtil.getHexStringFromColor(waypointColor)));
+        hexColorField.setEditableColor(ColorUtil.getHexFromColor(waypointColor));
         hexColorField.setChangedListener(newText -> {
             waypointColor = ColorUtil.getColorFromHexString(hexColorField.getText());
             if (waypointColor != null) {
