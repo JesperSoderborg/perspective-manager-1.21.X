@@ -267,7 +267,6 @@ public class PerspectiveSaveScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
 
-        super.render(context, mouseX, mouseY, delta);
         nameField.render(context, mouseX, mouseY, delta);
         xField.render(context, mouseX, mouseY, delta);
         yField.render(context, mouseX, mouseY, delta);
@@ -358,6 +357,8 @@ public class PerspectiveSaveScreen extends Screen {
 
             context.drawTexture(screenshotId, x, y, 0, 0, imgWidth, imgHeight, imgWidth, imgHeight);
         }
+
+        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override

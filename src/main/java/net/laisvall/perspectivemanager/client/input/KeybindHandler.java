@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.laisvall.perspectivemanager.client.logic.PerspectiveStorage;
 import net.laisvall.perspectivemanager.client.logic.PerspectiveSwitcher;
 import net.laisvall.perspectivemanager.client.ui.PerspectiveSaveScreen;
-import net.laisvall.perspectivemanager.client.util.ScreenshotHelper;
+import net.laisvall.perspectivemanager.client.util.ScreenshotUtil;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.util.InputUtil;
@@ -44,7 +44,7 @@ public class KeybindHandler {
             if (client.player == null) return;
 
             if (SAVE_PERSPECTIVE.wasPressed()) {
-                NativeImage image = ScreenshotHelper.takeScreenshot(client);
+                NativeImage image = ScreenshotUtil.takeHUDLessScreenshot(client);
                 client.setScreen(new PerspectiveSaveScreen(client, image));
             }
 

@@ -1,13 +1,13 @@
 package net.laisvall.perspectivemanager.client.logic;
 
 import net.laisvall.perspectivemanager.client.data.Perspective;
+import net.laisvall.perspectivemanager.client.util.MathUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -38,11 +38,11 @@ public class PerspectiveSaver {
                 id,
                 name,
                 color,
-                player.getX(),
-                player.getY(),
-                player.getZ(),
-                player.getYaw(),
-                player.getPitch(),
+                MathUtil.roundDouble(player.getX(), 1),
+                MathUtil.roundDouble(player.getY(), 1),
+                MathUtil.roundDouble(player.getZ(), 1),
+                MathUtil.roundFloat(player.getYaw(), 1),
+                MathUtil.roundFloat(player.getPitch(), 1),
                 options.getFov().getValue(),
                 hotkey,
                 dimensionId.toString(),
