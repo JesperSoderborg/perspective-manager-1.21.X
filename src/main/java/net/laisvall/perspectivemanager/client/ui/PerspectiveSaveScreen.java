@@ -101,6 +101,16 @@ public class PerspectiveSaveScreen extends Screen {
         int randomHue = ColorUtil.getRandomHue();
         waypointColor = ColorUtil.getColorFromHue(randomHue);
 
+        // Screenshot preview image
+        if (screenshotId != null) {
+            FramedImageWidget screenshotWidget = new FramedImageWidget(
+                    centerX - wideGap / 2 - imgWidth,
+                    centerY - imgHeight + offsetY,
+                    imgWidth, imgHeight,
+                    screenshotId);
+            this.addDrawableChild(screenshotWidget);
+        }
+
         // --- Name field ---
         nameField = new TextFieldWidget(this.textRenderer,
                 centerX - wideButtonWidth/2 + narrowGap, topRow,
@@ -244,7 +254,7 @@ public class PerspectiveSaveScreen extends Screen {
 
         toggleActiveViewButton = ButtonWidget.builder(Text.of("Active View: " + (activeViewEnabled ? "ON" : "OFF")), b -> {
                     activeViewEnabled = !activeViewEnabled;
-                    toggleActiveViewButton.setMessage(Text.of("Waypoint: " + (activeViewEnabled ? "ON" : "OFF")));
+                    toggleActiveViewButton.setMessage(Text.of("Active View: " + (activeViewEnabled ? "ON" : "OFF")));
                 }).dimensions(centerX + wideGap/2, thirdButtonRow, wideButtonWidth, buttonHeight)
                 .tooltip(Tooltip.of(Text.of("Toggle active view"))).build();
         this.addDrawableChild(toggleActiveViewButton);
@@ -266,6 +276,8 @@ public class PerspectiveSaveScreen extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context, mouseX, mouseY, delta);
+
+        super.render(context, mouseX, mouseY, delta);
 
         nameField.render(context, mouseX, mouseY, delta);
         xField.render(context, mouseX, mouseY, delta);
@@ -347,18 +359,6 @@ public class PerspectiveSaveScreen extends Screen {
                 hexColorField.getY() - textHeight - narrowGap/2,
                 0xFFFFFF
         );
-
-        if (screenshotId != null) {
-            int centerX = this.width/2;
-            int centerY = this.height/2;
-
-            int x = centerX - wideGap/2 - imgWidth;
-            int y = centerY - imgHeight + offsetY;
-
-            context.drawTexture(screenshotId, x, y, 0, 0, imgWidth, imgHeight, imgWidth, imgHeight);
-        }
-
-        super.render(context, mouseX, mouseY, delta);
     }
 
     @Override
