@@ -4,11 +4,14 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.laisvall.perspectivemanager.client.logic.PerspectiveSaver;
 import net.laisvall.perspectivemanager.client.util.ColorUtil;
+import net.laisvall.perspectivemanager.client.util.MathUtil;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.TextIconButtonWidget;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.util.InputUtil;
@@ -37,7 +40,7 @@ public class PerspectiveSaveScreen extends Screen {
     private TextFieldWidget hexColorField;
     private ColorSliderWidget colorSliderWidget;
 
-    private Identifier iconTexture = Identifier.of("mymod", "textures/gui/icon.png");
+    private final Identifier iconTexture = Identifier.of("mymod", "textures/gui/icon.png");
     private ButtonWidget toggleWaypointButton;
     private ButtonWidget toggleActiveViewButton;
     private ButtonWidget hotkeyButton;
@@ -59,10 +62,15 @@ public class PerspectiveSaveScreen extends Screen {
     private final int wideButtonWidth = 2*shortButtonWidth + narrowGap;
     private final int buttonHeight = ButtonWidget.DEFAULT_HEIGHT;
     private final int iconButtonSide = ButtonWidget.DEFAULT_HEIGHT;
-    private final int imgHeight = wideButtonWidth*9/16;
-    private final int imgWidth = wideButtonWidth;
     private final int offsetY = 32;
     private final int textHeight = 8;
+
+    private double perspectiveX;
+    private double perspectiveY;
+    private double perspectiveZ;
+    private float perspectiveYaw;
+    private float perspectivePitch;
+    private int perspectiveFov;
 
     public PerspectiveSaveScreen(MinecraftClient client, NativeImage screenshot) {
         super(Text.of("Save Perspective"));
@@ -71,20 +79,36 @@ public class PerspectiveSaveScreen extends Screen {
         if (screenshot != null) {
             setScreenshot(screenshot);
         }
+
+        if (client.player != null) {
+            setPerspectiveValues(client.player, client.options);
+        }
     }
 
     public void setScreenshot(NativeImage screenshot) {
         if (screenshotTexture != null) screenshotTexture.close();
 
         this.screenshot = screenshot;
-        this.screenshotTexture = new NativeImageBackedTexture(screenshot);
-        this.screenshotId = client.getTextureManager().registerDynamicTexture("temp_screenshot", screenshotTexture);
+        screenshotTexture = new NativeImageBackedTexture(screenshot);
+        screenshotId = client.getTextureManager().registerDynamicTexture("temp_screenshot", screenshotTexture);
     }
+
+    private void setPerspectiveValues(ClientPlayerEntity player, GameOptions options) {
+        perspectiveX = MathUtil.roundDouble(client.player.getX(), 1);
+        perspectiveY = MathUtil.roundDouble(client.player.getY(), 1);
+        perspectiveZ = MathUtil.roundDouble(client.player.getZ(), 1);
+        perspectiveYaw = MathUtil.roundFloat(client.player.getYaw(), 1);
+        perspectivePitch = MathUtil.roundFloat(client.player.getPitch(), 1);
+        perspectiveFov = client.options.getFov().getValue();
+    };
 
     @Override
     protected void init() {
         int centerX = this.width / 2;
         int centerY = this.height / 2;
+
+        int imgHeight = wideButtonWidth * 9 / 16;
+        int imgWidth = wideButtonWidth;
 
         int rowGap = (imgHeight - 4*buttonHeight - narrowGap)/2;
         int firstRow = centerY - imgHeight + offsetY;
@@ -130,9 +154,9 @@ public class PerspectiveSaveScreen extends Screen {
         xField = new TextFieldWidget(this.textRenderer, xFieldX, firstRow, wideFieldWidth, buttonHeight, Text.of("X"));
         zField = new TextFieldWidget(this.textRenderer, zFieldX, firstRow, wideFieldWidth, buttonHeight, Text.of("Z"));
         yField = new TextFieldWidget(this.textRenderer, yFieldX, firstRow, narrowFieldWidth, buttonHeight, Text.of("Y"));
-        xField.setText(String.format("%.1f", client.player.getX()));
-        zField.setText(String.format("%.1f", client.player.getZ()));
-        yField.setText(String.format("%.1f", client.player.getY()));
+        xField.setText(String.valueOf(perspectiveX));
+        yField.setText(String.valueOf(perspectiveY));
+        zField.setText(String.valueOf(perspectiveZ));
         this.addSelectableChild(xField);
         this.addSelectableChild(yField);
         this.addSelectableChild(zField);
@@ -145,9 +169,9 @@ public class PerspectiveSaveScreen extends Screen {
         yawField = new TextFieldWidget(this.textRenderer, yawFieldX, secondRow, wideFieldWidth, buttonHeight, Text.of("Yaw"));
         pitchField = new TextFieldWidget(this.textRenderer, pitchFieldX, secondRow, wideFieldWidth, buttonHeight, Text.of("Pitch"));
         fovField = new TextFieldWidget(this.textRenderer, fovFieldX, secondRow, narrowFieldWidth, buttonHeight, Text.of("fov"));
-        yawField.setText(String.format("%.1f", client.player.getYaw()));
-        pitchField.setText(String.format("%.1f", client.player.getPitch()));
-        fovField.setText(String.valueOf(client.options.getFov().getValue()));
+        yawField.setText(String.valueOf(this.perspectiveYaw));
+        pitchField.setText(String.valueOf(this.perspectivePitch));
+        fovField.setText(String.valueOf(this.perspectiveFov));
         this.addSelectableChild(yawField);
         this.addSelectableChild(pitchField);
         this.addSelectableChild(fovField);
@@ -179,17 +203,25 @@ public class PerspectiveSaveScreen extends Screen {
         this.addDrawableChild(colorSliderWidget);
 
         // --- Icon buttons ---
-        TextIconButtonWidget favoriteButton = TextIconButtonWidget.builder(Text.literal(""), b -> {}, true)
+        TextIconButtonWidget favoriteButton = TextIconButtonWidget.builder(Text.literal(""), b -> {
+            // TODO Add favorite function and texture
+                }, true)
                 .dimension(iconButtonSide, iconButtonSide).texture(iconTexture, 16, 16).build();
         favoriteButton.setPosition(centerX + wideButtonWidth/2 - 2*iconButtonSide - narrowGap, topRow);
         this.addDrawableChild(favoriteButton);
 
-        TextIconButtonWidget shareButton = TextIconButtonWidget.builder(Text.literal(""), b -> {}, true)
+        TextIconButtonWidget shareButton = TextIconButtonWidget.builder(Text.literal(""), b -> {
+            // TODO Add sharing capabilities
+                }, true)
                 .dimension(iconButtonSide, iconButtonSide).texture(iconTexture, 16, 16).build();
         shareButton.setPosition(centerX + wideButtonWidth/2 - iconButtonSide, topRow);
         this.addDrawableChild(shareButton);
 
-        TextIconButtonWidget refreshScreenshotButton = TextIconButtonWidget.builder(Text.literal(""), b -> {}, true)
+        TextIconButtonWidget refreshScreenshotButton = TextIconButtonWidget.builder(Text.literal(""), b -> {
+            // TODO Refresh screenshot by taking a new screenshot from that position
+            // If player is at the position then let them refresh otherwise ask them to teleport
+
+                }, true)
                 .dimension(iconButtonSide, iconButtonSide)
                 .texture(iconTexture, 16, 16).build();
         refreshScreenshotButton.setPosition(centerX - wideGap/2 - wideButtonWidth - narrowGap, firstRow - narrowGap);
@@ -204,18 +236,31 @@ public class PerspectiveSaveScreen extends Screen {
         this.addDrawableChild(deleteButton);
 
         ButtonWidget teleportButton = ButtonWidget.builder(Text.of("Teleport"), b -> {
-                    // TODO teleport logic
+                    perspectiveX = Double.parseDouble(xField.getText());
+                    perspectiveY = Double.parseDouble(yField.getText());
+                    perspectiveZ = Double.parseDouble(zField.getText());
+
+                    perspectiveYaw = Float.parseFloat(yawField.getText());
+                    perspectivePitch = Float.parseFloat(pitchField.getText());
+
+                    perspectiveFov = Integer.parseInt(fovField.getText());
+
+                    client.player.setPos(perspectiveX, perspectiveY, perspectiveZ);
+                    client.player.setYaw(perspectiveYaw);
+                    client.player.setPitch(perspectivePitch);
+                    client.options.getFov().setValue(perspectiveFov);
                 }).dimensions(centerX - wideGap/2 - shortButtonWidth, secondButtonRow, shortButtonWidth, buttonHeight)
                 .tooltip(Tooltip.of(Text.of("Teleport to coords"))).build();
         this.addDrawableChild(teleportButton);
 
         ButtonWidget allPerspectivesButton = ButtonWidget.builder(Text.of("All Perspectives"), b -> {
-                    // TODO open manager
+                    client.setScreen(new PerspectiveManagerScreen(client.currentScreen));
                 }).dimensions(centerX - wideGap/2 - wideButtonWidth, thirdButtonRow, wideButtonWidth, buttonHeight)
                 .tooltip(Tooltip.of(Text.of("View all perspectives"))).build();
         this.addDrawableChild(allPerspectivesButton);
 
         ButtonWidget useCurrentPositionButton = ButtonWidget.builder(Text.of("Use Current Position"), b -> {
+            // TODO Change fields based on position
                 }).dimensions(centerX + wideGap/2, thirdRow, wideButtonWidth, buttonHeight)
                 .tooltip(Tooltip.of(Text.of("Use Current Position"))).build();
         this.addDrawableChild(useCurrentPositionButton);
@@ -236,9 +281,30 @@ public class PerspectiveSaveScreen extends Screen {
 
         ButtonWidget saveButton = ButtonWidget.builder(Text.of("Save"), b -> {
                     String name = nameField.getText().isEmpty() ? "Unnamed" : nameField.getText();
-                    int hotkey = selectedHotkey == null ? GLFW.GLFW_KEY_UNKNOWN : selectedHotkey;
                     int color = ColorUtil.getHexFromColor(waypointColor);
-                    PerspectiveSaver.saveCurrentPerspective(client, screenshot, name, color, hotkey);
+
+                    perspectiveX = Double.parseDouble(xField.getText());
+                    perspectiveY = Double.parseDouble(yField.getText());
+                    perspectiveZ = Double.parseDouble(zField.getText());
+
+                    perspectiveYaw = Float.parseFloat(yawField.getText());
+                    perspectivePitch = Float.parseFloat(pitchField.getText());
+
+                    perspectiveFov = Integer.parseInt(fovField.getText());
+
+                    int hotkey = selectedHotkey == null ? GLFW.GLFW_KEY_UNKNOWN : selectedHotkey;
+
+                    PerspectiveSaver.saveCurrentPerspective(
+                            client,
+                            name,
+                            color,
+                            perspectiveX, perspectiveY, perspectiveZ,
+                            perspectiveYaw, perspectivePitch,
+                            perspectiveFov,
+                            hotkey,
+                            screenshot
+                    );
+
                     client.setScreen(null);
                 }).dimensions(centerX + narrowGap/2, bottomRow, shortButtonWidth, buttonHeight)
                 .tooltip(Tooltip.of(Text.of("Save perspective"))).build();

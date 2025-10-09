@@ -1,11 +1,8 @@
 package net.laisvall.perspectivemanager.client.logic;
 
 import net.laisvall.perspectivemanager.client.data.Perspective;
-import net.laisvall.perspectivemanager.client.util.MathUtil;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.texture.NativeImage;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 
 import java.io.File;
@@ -16,12 +13,7 @@ import java.util.UUID;
 public class PerspectiveSaver {
     private PerspectiveSaver() {}
 
-    public static void saveCurrentPerspective(MinecraftClient client, NativeImage screenshot, String name, int color, int hotkey) {
-        if (client.player == null || client.world == null) return;
-
-        PlayerEntity player = client.player;
-        GameOptions options = client.options;
-
+    public static void saveCurrentPerspective(MinecraftClient client, String name, int color, double x, double y, double z, float yaw, float pitch, int fov, int hotkey, NativeImage screenshot) {
         Identifier dimensionId = client.world.getRegistryKey().getValue();
         String id = UUID.randomUUID().toString();
 
@@ -38,12 +30,9 @@ public class PerspectiveSaver {
                 id,
                 name,
                 color,
-                MathUtil.roundDouble(player.getX(), 1),
-                MathUtil.roundDouble(player.getY(), 1),
-                MathUtil.roundDouble(player.getZ(), 1),
-                MathUtil.roundFloat(player.getYaw(), 1),
-                MathUtil.roundFloat(player.getPitch(), 1),
-                options.getFov().getValue(),
+                x, y, z,
+                yaw, pitch,
+                fov,
                 hotkey,
                 dimensionId.toString(),
                 "thumbnails/" + id + ".png"

@@ -44,7 +44,7 @@ public class KeybindHandler {
             if (client.player == null) return;
 
             if (SAVE_PERSPECTIVE.wasPressed()) {
-                NativeImage image = ScreenshotUtil.takeHUDLessScreenshot(client);
+                NativeImage image = ScreenshotUtil.takeScreenshot(client);
                 client.setScreen(new PerspectiveSaveScreen(client, image));
             }
 
